@@ -30,11 +30,13 @@ export const detectEmotion = async (text) => {
  * Get music recommendations for an emotion.
  * @param {string} emotion
  * @param {number} intensity - 1 to 10
+ * @param {string} language
+ * @param {string} genre
  * @returns {{ emotion, intensity, songs }}
  */
-export const getSongs = async (emotion, intensity = 5) => {
+export const getSongs = async (emotion, intensity = 5, language = 'English', genre = '') => {
   const response = await api.get('/api/music', {
-    params: { emotion, intensity },
+    params: { emotion, intensity, language, genre },
   });
   return response.data;
 };

@@ -12,11 +12,13 @@ const MAX_CHARS = 500;
 const InputSection = ({ onSubmit, loading }) => {
   const [text, setText] = useState('');
   const [intensity, setIntensity] = useState(5);
+  const [language, setLanguage] = useState('English');
+  const [genre, setGenre] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!text.trim() || loading) return;
-    onSubmit(text.trim(), intensity);
+    onSubmit(text.trim(), intensity, language, genre);
   };
 
   const charsLeft = MAX_CHARS - text.length;
@@ -49,24 +51,68 @@ const InputSection = ({ onSubmit, loading }) => {
             : `${charsLeft} characters remaining`}
         </div>
 
-        {/* Intensity slider */}
-        <div className="slider-row">
-          <span className="slider-label">
-            Mood intensity
-            <span className="intensity-val">{intensity}/10</span>
-          </span>
-          <input
-            id="intensity-slider"
-            type="range"
-            className="mood-slider"
-            min={1}
-            max={10}
-            step={1}
-            value={intensity}
-            onChange={(e) => setIntensity(Number(e.target.value))}
-            disabled={loading}
-            aria-label="Mood intensity from 1 to 10"
-          />
+        {/* Filters Row: Intensity, Language, Genre */}
+        <div className="filters-grid">
+          {/* Intensity slider */}
+          <div className="slider-row filter-item">
+            <span className="slider-label">
+              Mood intensity
+              <span className="intensity-val">{intensity}/10</span>
+            </span>
+            <input
+              id="intensity-slider"
+              type="range"
+              className="mood-slider"
+              min={1}
+              max={10}
+              step={1}
+              value={intensity}
+              onChange={(e) => setIntensity(Number(e.target.value))}
+              disabled={loading}
+              aria-label="Mood intensity from 1 to 10"
+            />
+          </div>
+
+          <div className="dropdowns-row">
+            <div className="filter-item">
+              <label htmlFor="language-select" className="slider-label">Language</label>
+              <select 
+                id="language-select" 
+                className="custom-select" 
+                value={language} 
+                onChange={(e) => setLanguage(e.target.value)}
+                disabled={loading}
+              >
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Korean">Korean</option>
+                <option value="Japanese">Japanese</option>
+                <option value="French">French</option>
+              </select>
+            </div>
+
+            <div className="filter-item">
+              <label htmlFor="genre-select" className="slider-label">Genre</label>
+              <select 
+                id="genre-select" 
+                className="custom-select" 
+                value={genre} 
+                onChange={(e) => setGenre(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">Any Genre</option>
+                <option value="Pop">Pop</option>
+                <option value="Rock">Rock</option>
+                <option value="Hip Hop">Hip Hop</option>
+                <option value="Lo-Fi">Lo-Fi</option>
+                <option value="Classical">Classical</option>
+                <option value="Electronic">Electronic</option>
+                <option value="R&B">R&B</option>
+                <option value="Jazz">Jazz</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Submit */}

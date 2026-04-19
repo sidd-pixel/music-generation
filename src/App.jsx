@@ -1,16 +1,5 @@
 /**
  * App.jsx — MoodTune Root Component
- *
- * State:
- *   emotionData  — result from /api/emotion
- *   songs        — array from /api/music
- *   loading      — true while either API call is in-flight
- *   error        — string error message
- *
- * Flow:
- *   1. User submits text + intensity
- *   2. POST /api/emotion  → set emotionData
- *   3. GET  /api/music    → set songs
  */
 
 import { useState, useRef } from 'react';
@@ -22,20 +11,20 @@ import SongList from './components/SongList';
 import { detectEmotion, getSongs } from './services/api';
 
 function App() {
+  // Main feature state
   const [emotionData, setEmotionData] = useState(null);
   const [songs, setSongs] = useState([]);
   const [loadingEmotion, setLoadingEmotion] = useState(false);
   const [loadingSongs, setLoadingSongs] = useState(false);
   const [error, setError] = useState(null);
 
-  // Ref to scroll-to results after analysis
   const resultsRef = useRef(null);
 
   /**
    * Called when user submits the form.
    * Sequentially: detect emotion → fetch songs.
    */
-  const handleAnalyze = async (text, intensity) => {
+  const handleAnalyze = async (text, intensity, language, genre) => {
     setError(null);
     setEmotionData(null);
     setSongs([]);
@@ -58,10 +47,9 @@ function App() {
     // ── Step 2: Fetch songs ──
     setLoadingSongs(true);
     try {
-      const musicData = await getSongs(detected.emotion, intensity);
+      const musicData = await getSongs(detected.emotion, intensity, language, genre);
       setSongs(musicData.songs || []);
 
-      // Scroll to results
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);
@@ -112,7 +100,11 @@ function App() {
         )}
 
         {/* Song list / skeletons */}
-        <SongList songs={songs} loading={loadingSongs} />
+        <SongList 
+          songs={songs} 
+          loading={loadingSongs} 
+          emotion={emotionData?.emotion} 
+        />
       </div>
     </div>
   );
