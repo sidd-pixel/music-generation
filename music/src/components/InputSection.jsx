@@ -30,6 +30,13 @@ const InputSection = ({ onSubmit, loading }) => {
     onSubmit(text.trim(), intensity, language, genre);
   };
 
+  const handleClear = () => {
+    setText('');
+    setIntensity(5);
+    setLanguage('English');
+    setGenre('');
+  };
+
   const charsLeft = MAX_CHARS - text.length;
   const isOverLimit = text.length > MAX_CHARS;
 
@@ -124,28 +131,41 @@ const InputSection = ({ onSubmit, loading }) => {
           </div>
         </div>
 
-        {/* Submit */}
-        <button
-          id="analyze-btn"
-          type="submit"
-          className="submit-btn"
-          disabled={loading || !text.trim() || isOverLimit}
-        >
-          {loading ? (
-            <>
-              <LoadingSpinner size={17} />
-              Analyzing mood…
-            </>
-          ) : (
-            <>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="M21 21l-4.35-4.35"/>
-              </svg>
-              Analyze Mood &amp; Get Music
-            </>
-          )}
-        </button>
+        {/* Buttons */}
+        <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+          <button
+            type="button"
+            className="submit-btn"
+            style={{ margin: 0, flex: '0.3', background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+            onClick={handleClear}
+            disabled={loading}
+          >
+            Clear All
+          </button>
+          
+          <button
+            id="analyze-btn"
+            type="submit"
+            className="submit-btn"
+            style={{ margin: 0, flex: '1' }}
+            disabled={loading || !text.trim() || isOverLimit}
+          >
+            {loading ? (
+              <>
+                <LoadingSpinner size={17} />
+                Analyzing mood…
+              </>
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="M21 21l-4.35-4.35"/>
+                </svg>
+                Analyze Mood &amp; Get Music
+              </>
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );
