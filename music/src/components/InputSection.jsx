@@ -4,16 +4,25 @@
  * Handles local form state (text, char count).
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 
 const MAX_CHARS = 500;
 
 const InputSection = ({ onSubmit, loading }) => {
-  const [text, setText] = useState('');
-  const [intensity, setIntensity] = useState(5);
-  const [language, setLanguage] = useState('English');
-  const [genre, setGenre] = useState('');
+  const [text, setText] = useState(() => localStorage.getItem('moodTune_text') || '');
+  const [intensity, setIntensity] = useState(() => {
+    const saved = localStorage.getItem('moodTune_intensity');
+    return saved !== null ? Number(saved) : 5;
+  });
+  const [language, setLanguage] = useState(() => localStorage.getItem('moodTune_language') || 'English');
+  const [genre, setGenre] = useState(() => localStorage.getItem('moodTune_genre') || '');
+
+  // Persist form inputs immediately
+  useEffect(() => localStorage.setItem('moodTune_text', text), [text]);
+  useEffect(() => localStorage.setItem('moodTune_intensity', intensity.toString()), [intensity]);
+  useEffect(() => localStorage.setItem('moodTune_language', language), [language]);
+  useEffect(() => localStorage.setItem('moodTune_genre', genre), [genre]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

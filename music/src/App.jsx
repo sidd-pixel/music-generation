@@ -2,7 +2,7 @@
  * App.jsx — MoodTune Root Component
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './index.css';
 
 import InputSection from './components/InputSection';
@@ -11,17 +11,51 @@ import SongList from './components/SongList';
 import { detectEmotion, getSongs } from './services/api';
 
 function App() {
-  // Main feature state
-  const [emotionData, setEmotionData] = useState(null);
-  const [songs, setSongs] = useState([]);
+  // Main feature state with localStorage persistence
+  const [emotionData, setEmotionData] = useState(() => {
+    const saved = localStorage.getItem('moodTune_emotionData');
+    return saved ? JSON.parse(saved) : null;
+  });
+  
+  const [songs, setSongs] = useState(() => {
+    const saved = localStorage.getItem('moodTune_songs');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
   const [loadingEmotion, setLoadingEmotion] = useState(false);
   const [loadingSongs, setLoadingSongs] = useState(false);
   const [error, setError] = useState(null);
 
-  const [offset, setOffset] = useState(0);
-  const [currentParams, setCurrentParams] = useState(null);
+  const [offset, setOffset] = useState(() => {
+    const saved = localStorage.getItem('moodTune_offset');
+    return saved ? JSON.parse(saved) : 0;
+  });
+  
+  const [currentParams, setCurrentParams] = useState(() => {
+    const saved = localStorage.getItem('moodTune_currentParams');
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const resultsRef = useRef(null);
+
+  // Sync state changes to localStorage
+  useEffect(() => {
+    if (emotionData) localStorage.setItem('moodTune_emotionData', JSON.stringify(emotionData));
+    else localStorage.removeItem('moodTune_emotionData');
+  }, [emotionData]);
+
+  useEffect(() => {
+    localStorage.setItem('moodTune_songs', JSON.stringify(songs));
+  }, [songs]);
+
+  useEffect(() => {
+    localStorage.setItem('moodTune_offset', JSON.stringify(offset));
+  }, [offset]);
+
+  useEffect(() => {
+    if (currentParams) localStorage.setItem('moodTune_currentParams', JSON.stringify(currentParams));
+    else localStorage.removeItem('moodTune_currentParams');
+  }, [currentParams]);
 
   /**
    * Called when user submits the form.
