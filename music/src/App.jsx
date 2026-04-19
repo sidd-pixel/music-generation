@@ -18,6 +18,9 @@ function App() {
   const [loadingSongs, setLoadingSongs] = useState(false);
   const [error, setError] = useState(null);
 
+  const [offset, setOffset] = useState(0);
+  const [currentParams, setCurrentParams] = useState(null);
+
   const resultsRef = useRef(null);
 
   /**
@@ -28,6 +31,8 @@ function App() {
     setError(null);
     setEmotionData(null);
     setSongs([]);
+    setOffset(0);
+    setCurrentParams({ text, intensity, language, genre });
 
     // ── Step 1: Detect emotion ──
     setLoadingEmotion(true);
@@ -47,7 +52,7 @@ function App() {
     // ── Step 2: Fetch songs ──
     setLoadingSongs(true);
     try {
-      const musicData = await getSongs(detected.emotion, intensity, language, genre);
+      const musicData = await getSongs(detected.emotion, intensity, language, genre, 0);
       setSongs(musicData.songs || []);
 
       setTimeout(() => {
@@ -56,6 +61,30 @@ function App() {
 
     } catch (err) {
       const msg = err.response?.data?.error || err.message || 'Failed to fetch music recommendations.';
+      setError(msg);
+    } finally {
+      setLoadingSongs(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (!currentParams || !emotionData) return;
+    setLoadingSongs(true);
+    try {
+      const nextOffset = offset + 15;
+      const musicData = await getSongs(emotionData.emotion, currentParams.intensity, currentParams.language, currentParams.genre, nextOffset);
+      
+      // Filter out duplicate songs if the API returned them
+      const newSongs = musicData.songs || [];
+      setSongs(prev => {
+        const existingIds = new Set(prev.map(s => s.id));
+        const uniqueNew = newSongs.filter(s => !existingIds.has(s.id));
+        return [...prev, ...uniqueNew];
+      });
+      
+      setOffset(nextOffset);
+    } catch (err) {
+      const msg = err.response?.data?.error || err.message || 'Failed to load more songs.';
       setError(msg);
     } finally {
       setLoadingSongs(false);
@@ -104,6 +133,7 @@ function App() {
           songs={songs} 
           loading={loadingSongs} 
           emotion={emotionData?.emotion} 
+          onLoadMore={handleLoadMore}
         />
       </div>
     </div>

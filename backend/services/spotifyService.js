@@ -111,7 +111,7 @@ const resolveGenreKeyword = (genre, language) => {
  * @param {string} query
  * @param {string} market - Spotify ISO 3166-1 alpha-2 market code
  */
-const spotifySearch = async (token, query, market) => {
+const spotifySearch = async (token, query, market, offset = 0) => {
   try {
     const response = await axios.get(`${SPOTIFY_API_BASE}/search`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -120,6 +120,7 @@ const spotifySearch = async (token, query, market) => {
         type:   'track',
         limit:  10,
         market,
+        offset,
       },
       timeout: 10000,
     });
@@ -143,7 +144,8 @@ export const fetchRecommendations = async (
   emotion,
   intensity = 5,
   language  = 'English',
-  genre     = ''
+  genre     = '',
+  offset    = 0
 ) => {
   const token = await getAccessToken();
 
@@ -175,7 +177,7 @@ export const fetchRecommendations = async (
   const seenIds   = new Set();
 
   const results = await Promise.all(
-    finalQueries.map((query) => spotifySearch(token, query, market))
+    finalQueries.map((query) => spotifySearch(token, query, market, offset))
   );
 
   for (const tracks of results) {
@@ -191,7 +193,7 @@ export const fetchRecommendations = async (
   let finalTracks =
     allTracks.length > 0
       ? shuffleArray(allTracks).slice(0, 15)
-      : await fetchGenericFallback(token, language, genre, market);
+      : await fetchGenericFallback(token, language, genre, market, offset);
 
   // ── 7. Attach YouTube IDs in parallel ─────────────────────────────────────
   const tracksWithYoutube = await Promise.all(
@@ -209,7 +211,7 @@ export const fetchRecommendations = async (
  * Called when the emotion-specific search returns nothing.
  * Uses a generic "popular songs" query in the correct market/language context.
  */
-const fetchGenericFallback = async (token, language, genre, market) => {
+const fetchGenericFallback = async (token, language, genre, market, offset = 0) => {
   try {
     // Build a language-aware fallback query
     const languageFallbackTerms = {
@@ -227,7 +229,7 @@ const fetchGenericFallback = async (token, language, genre, market) => {
 
     console.log(`[SpotifyService] Fallback query: "${fallbackQuery}" market="${market}"`);
 
-    const tracks = await spotifySearch(token, fallbackQuery, market);
+    const tracks = await spotifySearch(token, fallbackQuery, market, offset);
     return tracks.map(formatTrack);
   } catch (err) {
     console.error('Fallback search failed:', err.message);

@@ -34,9 +34,9 @@ export const detectEmotion = async (text) => {
  * @param {string} genre
  * @returns {{ emotion, intensity, songs }}
  */
-export const getSongs = async (emotion, intensity = 5, language = 'English', genre = '') => {
+export const getSongs = async (emotion, intensity = 5, language = 'English', genre = '', offset = 0) => {
   const response = await api.get('/api/music', {
-    params: { emotion, intensity, language, genre },
+    params: { emotion, intensity, language, genre, offset },
   });
   return response.data;
 };

@@ -19,7 +19,7 @@ const SkeletonCard = () => (
   </div>
 );
 
-const SongList = ({ songs, loading }) => {
+const SongList = ({ songs, loading, emotion, onLoadMore }) => {
   const [playingId, setPlayingId] = useState(null);
   const [activeYoutubeId, setActiveYoutubeId] = useState(null);
 
@@ -38,20 +38,21 @@ const SongList = ({ songs, loading }) => {
     setActiveYoutubeId(null);
   };
 
-  if (loading) {
-    return (
-      <>
-        <div className="songs-section-title" aria-live="polite">Finding your soundtrack…</div>
-        <div className="songs-grid" aria-label="Loading songs">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      </>
-    );
+  if (!songs || songs.length === 0) {
+    if (loading) {
+      return (
+        <>
+          <div className="songs-section-title" aria-live="polite">Finding your soundtrack…</div>
+          <div className="songs-grid" aria-label="Loading songs">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </>
+      );
+    }
+    return null;
   }
-
-  if (!songs || songs.length === 0) return null;
 
   return (
     <section aria-label="Recommended songs">
@@ -74,7 +75,7 @@ const SongList = ({ songs, loading }) => {
       <div className="songs-grid">
         {songs.map((song, idx) => (
           <div
-            key={song.id || idx}
+            key={`${song.id}-${idx}`}
             style={{ animationDelay: `${idx * 0.05}s` }}
           >
             <SongCard 
@@ -85,6 +86,20 @@ const SongList = ({ songs, loading }) => {
           </div>
         ))}
       </div>
+
+      {loading ? (
+        <div className="songs-grid" aria-label="Loading more songs" style={{ marginTop: '1.5rem' }}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={`sk-${i}`} />
+          ))}
+        </div>
+      ) : (
+        <div className="load-more-container" style={{ textAlign: 'center', marginTop: '2.5rem', marginBottom: '2.5rem' }}>
+          <button onClick={onLoadMore} className="submit-btn" style={{ width: 'auto', padding: '0.8rem 2.5rem', display: 'inline-flex' }}>
+            Load More Songs
+          </button>
+        </div>
+      )}
     </section>
   );
 };

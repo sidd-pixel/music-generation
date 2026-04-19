@@ -12,6 +12,7 @@ export const getRecommendations = async (req, res) => {
     const { emotion, intensity } = req.query;
     const language = req.query.language || 'English';
     const genre    = req.query.genre    || '';
+    const offset   = parseInt(req.query.offset, 10) || 0;
 
     // Validate emotion
     if (!emotion) {
@@ -28,16 +29,17 @@ export const getRecommendations = async (req, res) => {
 
     console.log(
       `[MusicController] emotion="${resolvedEmotion}" intensity=${intensityLevel} ` +
-      `language="${language}" genre="${genre}"`
+      `language="${language}" genre="${genre}" offset=${offset}`
     );
 
-    const songs = await fetchRecommendations(resolvedEmotion, intensityLevel, language, genre);
+    const songs = await fetchRecommendations(resolvedEmotion, intensityLevel, language, genre, offset);
 
     return res.json({
       emotion:  resolvedEmotion,
       intensity: intensityLevel,
       language,
       genre,
+      offset,
       songs,
     });
 
