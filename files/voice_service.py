@@ -3,9 +3,9 @@ from pathlib import Path
 
 import httpx
 
-from app.config import get_settings
-from app.utils.helpers import generate_silence, with_retry
-from app.utils.logger import get_logger
+from config import get_settings
+from helpers import generate_silence, with_retry
+from logger import get_logger
 
 logger = get_logger("voice_service")
 settings = get_settings()
@@ -27,21 +27,15 @@ async def generate_voice(
     TMP.mkdir(exist_ok=True)
     silence_path = TMP / f"voice_silence_{int(time.time()*1000)}.mp3"
 
-    if mock:
+    # Always return silent placeholder if mock or ElevenLabs is not available/working
+    if mock or not settings.eleven_api_key:
         await generate_silence(silence_path, duration)
         return silence_path.read_bytes()
 
-    if not settings.eleven_api_key:
-        logger.warning("ELEVEN_API_KEY not set — returning silent voice placeholder")
-        await generate_silence(silence_path, duration)
-        return silence_path.read_bytes()
-
-    # Delivery hint prepended to text — ElevenLabs respects these
+    # Try ElevenLabs, but fallback to silence on any error
     mood_hint = f"[{mood.capitalize()} tone, spoken word, slow and poetic] " if mood else "[Spoken word, poetic] "
     payload_text = mood_hint + text
-
     logger.debug(f"Generating voice for {len(text)} chars of lyrics")
-
     async def _call() -> bytes:
         async with httpx.AsyncClient(timeout=40) as client:
             resp = await client.post(
@@ -66,5 +60,9 @@ async def generate_voice(
             data = resp.content
             logger.info(f"[voice] Received {len(data):,} bytes from ElevenLabs")
             return data
-
-    return await with_retry(_call, retries=2, delay=1.0, label="ElevenLabs TTS")
+    try:
+        return await with_retry(_call, retries=2, delay=1.0, label="ElevenLabs TTS")
+    except Exception as e:
+        logger.warning(f"ElevenLabs failed ({e}), returning silent placeholder")
+        await generate_silence(silence_path, duration)
+        return silence_path.read_bytes()

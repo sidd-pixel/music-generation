@@ -1,8 +1,8 @@
 from fastapi import APIRouter
-from app.config import get_settings
-from app.models import HealthResponse
-from app.utils.queue import job_queue
-from app.services.music_service import _audiocraft_available
+from config import get_settings
+from models import HealthResponse
+from job_queue import job_queue
+from music_service import _audiocraft_available
 
 router = APIRouter()
 settings = get_settings()

@@ -3,9 +3,9 @@ import time
 from functools import lru_cache
 from pathlib import Path
 
-from app.config import get_settings
-from app.utils.helpers import generate_silence
-from app.utils.logger import get_logger
+from config import get_settings
+from helpers import generate_silence
+from logger import get_logger
 
 logger = get_logger("music_service")
 settings = get_settings()

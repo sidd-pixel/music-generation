@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Callable, Coroutine
 
-from app.utils.logger import get_logger
+from logger import get_logger
 
 logger = get_logger("helpers")
 

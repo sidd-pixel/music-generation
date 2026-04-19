@@ -6,9 +6,9 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.config import get_settings
-from app.routes import generate, health
-from app.utils.logger import get_logger
+from config import get_settings
+import generate, health
+from logger import get_logger
 
 logger = get_logger("app")
 settings = get_settings()

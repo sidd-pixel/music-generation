@@ -1,9 +1,9 @@
 import httpx
 
-from app.config import get_settings
-from app.utils.helpers import with_retry
-from app.utils.logger import get_logger
-from app.utils.prompt_builder import build_lyrics_prompt
+from config import get_settings
+from helpers import with_retry
+from logger import get_logger
+from prompt_builder import build_lyrics_prompt
 
 logger = get_logger("lyrics_service")
 settings = get_settings()

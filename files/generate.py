@@ -5,20 +5,20 @@ from pathlib import Path
 from fastapi import APIRouter, Header, Query, HTTPException, Request
 from fastapi.responses import FileResponse
 
-from app.models import GenerateRequest, GenerateResponse, ErrorResponse
-from app.services.lyrics_service import generate_lyrics
-from app.services.music_service import generate_music
-from app.services.voice_service import generate_voice
-from app.services.merge_service import merge_audio
-from app.utils.helpers import validate_input
-from app.utils.prompt_builder import build_music_prompt
-from app.utils.queue import job_queue
-from app.utils.logger import get_logger
+from models import GenerateRequest, GenerateResponse, ErrorResponse
+from lyrics_service import generate_lyrics
+from music_service import generate_music
+from voice_service import generate_voice
+from merge_service import merge_audio
+from helpers import validate_input
+from prompt_builder import build_music_prompt
+from job_queue import job_queue
+from logger import get_logger
 
 router = APIRouter()
 logger = get_logger("route.generate")
 
-TMP = Path("tmp")
+TMP = Path("music")
 
 
 @router.post(

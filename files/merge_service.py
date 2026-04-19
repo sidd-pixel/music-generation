@@ -1,7 +1,7 @@
 import asyncio
 from pathlib import Path
 
-from app.utils.logger import get_logger
+from logger import get_logger
 
 logger = get_logger("merge_service")
 

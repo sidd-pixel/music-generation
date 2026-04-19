@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from app.app import create_app
-from app.config import get_settings
+from app import create_app
+from config import get_settings
 
 settings = get_settings()
 app = create_app()

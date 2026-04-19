@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable, Coroutine, Dict, Optional
 
-from app.config import get_settings
-from app.utils.logger import get_logger
+from config import get_settings
+from logger import get_logger
 
 logger = get_logger("queue")
 settings = get_settings()
